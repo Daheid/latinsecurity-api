@@ -23,4 +23,9 @@ class Event extends Model
         'result',
         'implementation',
     ];
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }
