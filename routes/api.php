@@ -14,3 +14,6 @@ Route::get('/publications', [PublicationController::class, 'index']);
 
 // Crear una nueva publicación
 Route::post('/publications', [PublicationController::class, 'store']);
+
+// Nueva ruta para actualizar
+Route::put('/publications/{publication}', [PublicationController::class, 'update']);

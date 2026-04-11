@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePublicationRequest;
 use Illuminate\Http\JsonResponse;
 use App\Models\Publication;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UpdatePublicationRequest;
 
 class PublicationController extends Controller
 {
@@ -56,5 +59,37 @@ class PublicationController extends Controller
             'message' => 'Publication created successfully.',
             'data'    => $validatedData // Retorna $publication si usaste el modelo
         ], 201);
+    }
+
+    public function update(UpdatePublicationRequest $request, Publication $publication): JsonResponse
+    {
+        $validatedData = $request->validated();
+
+        // 1. Verificar si el usuario está subiendo un NUEVO archivo PDF
+        if ($request->hasFile('pdf_file')) {
+
+            // Borramos el PDF viejo del disco 'public' para no acumular basura
+            if (Storage::disk('public')->exists($publication->pdf_path)) {
+                Storage::disk('public')->delete($publication->pdf_path);
+            }
+
+            // Guardamos el nuevo archivo
+            $pdfPath = $request->file('pdf_file')->store('publications', 'public');
+            $validatedData['pdf_path'] = $pdfPath;
+
+            unset($validatedData['pdf_file']);
+        }
+
+        // 2. Actualizamos el registro en la base de datos
+        $publication->update($validatedData);
+
+        // 3. Añadimos la URL del PDF a la respuesta por comodidad del frontend
+        $publication->pdf_url = asset('storage/' . $publication->pdf_path);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Publication updated successfully.',
+            'data'    => $publication
+        ], 200);
     }
 }
