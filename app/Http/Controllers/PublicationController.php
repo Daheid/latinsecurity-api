@@ -92,4 +92,24 @@ class PublicationController extends Controller
             'data'    => $publication
         ], 200);
     }
+
+    /**
+     * Eliminar una publicación y su archivo PDF
+     */
+    public function destroy(Publication $publication): JsonResponse
+    {
+        // 1. Verificar si el PDF existe físicamente en el disco y eliminarlo
+        if ($publication->pdf_path && Storage::disk('public')->exists($publication->pdf_path)) {
+            Storage::disk('public')->delete($publication->pdf_path);
+        }
+
+        // 2. Eliminar el registro de la base de datos
+        $publication->delete();
+
+        // 3. Retornar una respuesta de éxito
+        return response()->json([
+            'success' => true,
+            'message' => 'Publication deleted successfully.'
+        ], 200); // 200 OK
+    }
 }

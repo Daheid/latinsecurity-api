@@ -17,3 +17,6 @@ Route::post('/publications', [PublicationController::class, 'store']);
 
 // Nueva ruta para actualizar
 Route::put('/publications/{publication}', [PublicationController::class, 'update']);
+
+// Nueva ruta para eliminar
+Route::delete('/publications/{publication}', [PublicationController::class, 'destroy']);
