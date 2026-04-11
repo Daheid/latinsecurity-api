@@ -6,6 +6,8 @@ use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\CompleteEventRequest;
 use App\Models\Event;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use App\Jobs\SendEventCertificatesJob;
 
 class EventController extends Controller
 {
@@ -46,24 +48,36 @@ class EventController extends Controller
      */
     public function markAsReady(CompleteEventRequest $request, Event $event): JsonResponse
     {
-        // Verificamos que no esté cerrado ya
         if ($event->status === 'ready') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Este evento ya fue marcado como listo anteriormente.'
-            ], 400);
+            return response()->json(['success' => false, 'message' => 'Evento ya finalizado.'], 400);
         }
 
-        // Actualizamos el estado y guardamos el resultado/implementación
-        $event->update([
-            'status'         => 'ready',
-            'result'         => $request->result,
-            'implementation' => $request->implementation,
-        ]);
+        $data = $request->validated();
+
+        // Manejar la subida del certificado (imagen de fondo o plantilla)
+        if ($request->hasFile('certificate_file')) {
+            // Si ya existía uno, lo borramos
+            if ($event->certificate_path) {
+                Storage::disk('public')->delete($event->certificate_path);
+            }
+
+            $path = $request->file('certificate_file')->store('certificates', 'public');
+            $data['certificate_path'] = $path;
+        }
+
+        $data['status'] = 'ready';
+
+        $event->update($data);
+
+        // Añadimos la URL completa para el frontend
+        $event->certificate_url = $event->certificate_path ? asset('storage/' . $event->certificate_path) : null;
+
+        // 🚀 Despachamos el trabajo en segundo plano para generar y enviar los PDFs
+        SendEventCertificatesJob::dispatch($event);
 
         return response()->json([
             'success' => true,
-            'message' => 'Evento marcado como listo.',
+            'message' => 'Evento actualizado y marcado como listo. Los certificados se están generando y enviando en segundo plano.',
             'data'    => $event
         ]);
     }

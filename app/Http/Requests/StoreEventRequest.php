@@ -23,6 +23,8 @@ class StoreEventRequest extends FormRequest
             'topics'     => 'required|string',
             'objectives' => 'nullable|string',
             'scopes'     => 'nullable|string',
+            'youtube_link' => 'nullable|url',
+            'certificate_file' => 'nullable|file|mimes:pdf,jpg,png|max:5120', // Máx 5MB
         ];
     }
 }

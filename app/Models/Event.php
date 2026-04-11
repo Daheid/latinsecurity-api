@@ -22,6 +22,8 @@ class Event extends Model
         'status',
         'result',
         'implementation',
+        'youtube_link',      // Nuevo
+        'certificate_path',   // Nuevo
     ];
 
     public function attendances()

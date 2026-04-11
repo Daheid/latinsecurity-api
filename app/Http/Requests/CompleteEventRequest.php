@@ -14,9 +14,10 @@ class CompleteEventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Al menos uno de los dos debería enviarse al cerrar el evento
-            'result'         => 'required_without:implementation|string',
-            'implementation' => 'required_without:result|string',
+            'result'           => 'required_without:implementation|string',
+            'implementation'    => 'required_without:result|string',
+            'youtube_link'     => 'nullable|url',
+            'certificate_file' => 'nullable|file|mimes:pdf,jpg,png|max:5120',
         ];
     }
 
