@@ -22,5 +22,6 @@ class Publication extends Model
         'abstract',
         'keywords',
         'pdf_path', // Importante habilitar este campo
+        'downloads',
     ];
 }

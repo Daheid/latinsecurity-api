@@ -112,4 +112,20 @@ class PublicationController extends Controller
             'message' => 'Publication deleted successfully.'
         ], 200); // 200 OK
     }
+    /**
+     * Registrar descarga y devolver URL del PDF
+     */
+    public function download(Publication $publication): JsonResponse
+    {
+        // 1. Incrementamos el contador en 1 mágicamente con Laravel
+        $publication->increment('downloads');
+
+        // 2. Retornamos la respuesta con la cantidad actualizada y la URL
+        return response()->json([
+            'success'      => true,
+            'message'      => 'Descarga registrada.',
+            'downloads'    => $publication->downloads,
+            'download_url' => asset('storage/' . $publication->pdf_path)
+        ]);
+    }
 }

@@ -42,3 +42,6 @@ Route::post('/events/{event}/attendances', [AttendanceController::class, 'store'
 
 // Rutas para Artículos (Esto crea automáticamente el GET, POST, PUT y DELETE)
 Route::apiResource('articles', ArticleController::class);
+
+// Registrar descarga de una publicación
+Route::post('/publications/{publication}/download', [PublicationController::class, 'download']);
