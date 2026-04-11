@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ArticleController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -38,3 +39,6 @@ Route::get('/events/{event}/attendances', [AttendanceController::class, 'index']
 
 // 2. Registrar asistente en un evento
 Route::post('/events/{event}/attendances', [AttendanceController::class, 'store']);
+
+// Rutas para Artículos (Esto crea automáticamente el GET, POST, PUT y DELETE)
+Route::apiResource('articles', ArticleController::class);
