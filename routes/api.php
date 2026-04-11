@@ -9,5 +9,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+// Obtener todas las publicaciones (con paginación)
+Route::get('/publications', [PublicationController::class, 'index']);
 
+// Crear una nueva publicación
 Route::post('/publications', [PublicationController::class, 'store']);

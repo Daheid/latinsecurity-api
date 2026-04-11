@@ -8,6 +8,28 @@ use App\Models\Publication;
 
 class PublicationController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        // 1. Obtenemos las publicaciones ordenadas por las más recientes
+        // Paginate(10) devolverá 10 resultados por página y los metadatos de paginación
+        $publications = Publication::latest()->paginate(10);
+
+        // 2. Transformamos los datos para añadir la URL completa del PDF al vuelo
+        $publications->getCollection()->transform(function ($publication) {
+            // Creamos un nuevo atributo dinámico llamado 'pdf_url'
+            // asset('storage/...') genera la URL base completa (ej. http://127.0.0.1:8000/storage/publications/archivo.pdf)
+            $publication->pdf_url = asset('storage/' . $publication->pdf_path);
+
+            return $publication;
+        });
+
+        // 3. Retornamos la respuesta
+        return response()->json([
+            'success' => true,
+            'message' => 'Publications retrieved successfully.',
+            'data'    => $publications
+        ], 200);
+    }
     public function store(StorePublicationRequest $request): JsonResponse
     {
         // 1. Obtener los datos ya validados
