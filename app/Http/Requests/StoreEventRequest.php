@@ -17,10 +17,10 @@ class StoreEventRequest extends FormRequest
             'title'      => 'required|string|max:255',
             'subtitle'   => 'required|string|max:255',
             'location'   => 'required|string|max:255',
-            'date'       => 'required|date',
-            'start_time' => 'required|date_format:H:i', // Formato de hora 24h ej. 14:30
-            'end_time'   => 'required|date_format:H:i|after:start_time', // Debe ser después de la hora de inicio
-            'topics'     => 'required|string',
+            'date'       => 'nullable|date',
+            'start_time' => 'nullable|date_format:H:i', // Formato de hora 24h ej. 14:30
+            'end_time'   => 'nullable|date_format:H:i|after:start_time', // Debe ser después de la hora de inicio
+            'topics'     => 'nullable|string',
             'objectives' => 'nullable|string',
             'scopes'     => 'nullable|string',
             'youtube_link' => 'nullable|url',
