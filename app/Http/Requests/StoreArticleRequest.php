@@ -20,7 +20,7 @@ class StoreArticleRequest extends FormRequest
         return [
             'title'       => "$rule|string|max:255",
             'description' => "$rule|string",
-            'link'        => "$rule|url|max:500", // Valida que sea un link real (http/https)
+            'link'        => "nullable|url|max:500", // Valida que sea un link real (http/https) si se proporciona
             'date'        => "$rule|date",
             'category'    => "$rule|in:institutional,conference,interview,news,linkedin", // Solo permite estos valores exactos
         ];
