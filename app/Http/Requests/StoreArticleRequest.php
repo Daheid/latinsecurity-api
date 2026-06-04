@@ -22,14 +22,14 @@ class StoreArticleRequest extends FormRequest
             'description' => "$rule|string",
             'link'        => "$rule|url|max:500", // Valida que sea un link real (http/https)
             'date'        => "$rule|date",
-            'category'    => "$rule|in:institutional,conference,interview,news", // Solo permite estos valores exactos
+            'category'    => "$rule|in:institutional,conference,interview,news,linkedin", // Solo permite estos valores exactos
         ];
     }
 
     public function messages()
     {
         return [
-            'category.in' => 'La categoría debe ser: institutional, conference, interview o news.',
+            'category.in' => 'La categoría debe ser: institutional, conference, interview, news o linkedin.',
             'link.url'    => 'El enlace proporcionado no es una URL válida.',
         ];
     }

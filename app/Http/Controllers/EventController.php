@@ -8,15 +8,12 @@ use App\Models\Event;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\SendEventCertificatesJob;
+use Stichoza\GoogleTranslate\GoogleTranslate; // 🚀 Importar traductor
 
 class EventController extends Controller
 {
-    /**
-     * Obtener todos los eventos (opcional: filtrar por estado)
-     */
     public function index(): JsonResponse
     {
-        // Puedes pasar ?status=active en la URL para ver solo los activos
         $status = request('status');
 
         $events = Event::when($status, function ($query, $status) {
@@ -29,23 +26,22 @@ class EventController extends Controller
         ]);
     }
 
-    /**
-     * Crear un nuevo evento
-     */
     public function store(StoreEventRequest $request): JsonResponse
     {
-        $event = Event::create($request->validated()); // Por defecto status será 'active'
+        $validatedData = $request->validated();
+
+        // 🚀 Traducimos título, subtítulo, locación, temas, etc. antes de crear
+        $validatedData = $this->autoTranslateData($validatedData);
+
+        $event = Event::create($validatedData);
 
         return response()->json([
             'success' => true,
-            'message' => 'Evento creado exitosamente.',
+            'message' => 'Evento creado y traducido exitosamente.',
             'data'    => $event
         ], 201);
     }
 
-    /**
-     * Marcar un evento como "ready" (listo) y añadir resultados
-     */
     public function markAsReady(CompleteEventRequest $request, Event $event): JsonResponse
     {
         if ($event->status === 'ready') {
@@ -54,9 +50,7 @@ class EventController extends Controller
 
         $data = $request->validated();
 
-        // Manejar la subida del certificado (imagen de fondo o plantilla)
         if ($request->hasFile('certificate_file')) {
-            // Si ya existía uno, lo borramos
             if ($event->certificate_path) {
                 Storage::disk('public')->delete($event->certificate_path);
             }
@@ -67,18 +61,51 @@ class EventController extends Controller
 
         $data['status'] = 'ready';
 
+        // 🚀 Traducimos los campos nuevos que llegan al finalizar (result, implementation)
+        $data = $this->autoTranslateData($data);
+
         $event->update($data);
 
-        // Añadimos la URL completa para el frontend
         $event->certificate_url = $event->certificate_path ? asset('storage/' . $event->certificate_path) : null;
 
-        // 🚀 Despachamos el trabajo en segundo plano para generar y enviar los PDFs
         SendEventCertificatesJob::dispatch($event);
 
         return response()->json([
             'success' => true,
-            'message' => 'Evento actualizado y marcado como listo. Los certificados se están generando y enviando en segundo plano.',
+            'message' => 'Evento actualizado, traducido y marcado como listo.',
             'data'    => $event
         ]);
+    }
+
+    /**
+     * 🚀 Motor de Traducción Automática Dinámico
+     */
+    private function autoTranslateData(array $data): array
+    {
+        $tr = new GoogleTranslate();
+        $tr->setSource(); // Detectar idioma automáticamente
+
+        // Lista de todos los campos que componen un evento
+        $fieldsToTranslate = [
+            'title',
+            'subtitle',
+            'location',
+            'topics',
+            'objectives',
+            'scopes',
+            'result',
+            'implementation'
+        ];
+
+        foreach ($fieldsToTranslate as $field) {
+            if (!empty($data[$field])) {
+                $data[$field] = [
+                    'es' => $tr->setTarget('es')->translate($data[$field]),
+                    'en' => $tr->setTarget('en')->translate($data[$field]),
+                ];
+            }
+        }
+
+        return $data;
     }
 }

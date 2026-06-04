@@ -4,12 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Translatable\HasTranslations; // 🚀 Importar trait
 
 class Publication extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations; // 🚀 Usar trait
 
-    // Definimos los campos que se pueden guardar de forma masiva
+    // 🚀 Definir los campos que serán traducibles
+    public $translatable = [
+        'title',
+        'type_of_publication',
+        'research_area',
+        'abstract',
+        'keywords'
+    ];
+
     protected $fillable = [
         'title',
         'author',
@@ -21,7 +30,7 @@ class Publication extends Model
         'research_area',
         'abstract',
         'keywords',
-        'pdf_path', // Importante habilitar este campo
+        'pdf_path',
         'downloads',
     ];
 }

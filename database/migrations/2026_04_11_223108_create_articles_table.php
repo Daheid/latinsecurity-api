@@ -10,8 +10,11 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('description');
+
+            // 🔥 Cambiamos a jsonb para guardar los idiomas
+            $table->jsonb('title');
+            $table->jsonb('description');
+
             $table->string('link'); // URL del artículo o video
             $table->date('date');
 

@@ -10,23 +10,25 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            // Campos obligatorios para la creación
-            $table->string('title');
-            $table->string('subtitle');
-            $table->string('location');
+
+            // 🔥 Campos traducibles convertidos a jsonb
+            $table->jsonb('title');
+            $table->jsonb('subtitle');
+            $table->jsonb('location');
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->text('topics');
+            $table->jsonb('topics');
 
-            // Campos opcionales para la creación
-            $table->text('objectives')->nullable();
-            $table->text('scopes')->nullable(); // Alcances
+            // 🔥 Campos opcionales convertidos a jsonb
+            $table->jsonb('objectives')->nullable();
+            $table->jsonb('scopes')->nullable();
 
-            // Campos para el estado y cierre del evento
             $table->enum('status', ['active', 'ready'])->default('active');
-            $table->text('result')->nullable();
-            $table->text('implementation')->nullable();
+
+            // 🔥 Resultados también a jsonb
+            $table->jsonb('result')->nullable();
+            $table->jsonb('implementation')->nullable();
 
             $table->timestamps();
         });

@@ -6,16 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('events', function (Blueprint $table) {
             $table->date('date')->nullable()->change();
             $table->time('start_time')->nullable()->change();
             $table->time('end_time')->nullable()->change();
-            $table->text('topics')->nullable()->change();
+            // 🔥 Asegurarse de que topics siga siendo jsonb al hacerlo nullable
+            $table->jsonb('topics')->nullable()->change();
         });
     }
 
@@ -25,7 +23,7 @@ return new class extends Migration
             $table->date('date')->nullable(false)->change();
             $table->time('start_time')->nullable(false)->change();
             $table->time('end_time')->nullable(false)->change();
-            $table->text('topics')->nullable(false)->change();
+            $table->jsonb('topics')->nullable(false)->change();
         });
     }
 };

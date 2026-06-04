@@ -6,6 +6,7 @@ use App\Http\Requests\StoreArticleRequest;
 use App\Models\Article;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Stichoza\GoogleTranslate\GoogleTranslate; // 🚀 Importar motor de traducción
 
 class ArticleController extends Controller
 {
@@ -14,15 +15,12 @@ class ArticleController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        // Iniciamos la consulta
         $query = Article::query();
 
-        // Si el frontend envía ?category=news, filtramos los resultados
         if ($request->has('category')) {
             $query->where('category', $request->category);
         }
 
-        // Ordenamos por fecha descendente (los más nuevos primero) y paginamos
         $articles = $query->orderBy('date', 'desc')->paginate(12);
 
         return response()->json([
@@ -36,11 +34,16 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request): JsonResponse
     {
-        $article = Article::create($request->validated());
+        $validatedData = $request->validated();
+
+        // 🚀 Traducimos el título y la descripción antes de guardarlos
+        $validatedData = $this->autoTranslateData($validatedData);
+
+        $article = Article::create($validatedData);
 
         return response()->json([
             'success' => true,
-            'message' => 'Artículo creado exitosamente.',
+            'message' => 'Artículo creado y traducido exitosamente.',
             'data'    => $article
         ], 201);
     }
@@ -50,11 +53,16 @@ class ArticleController extends Controller
      */
     public function update(StoreArticleRequest $request, Article $article): JsonResponse
     {
-        $article->update($request->validated());
+        $validatedData = $request->validated();
+
+        // 🚀 Traducimos el título y la descripción antes de actualizarlos
+        $validatedData = $this->autoTranslateData($validatedData);
+
+        $article->update($validatedData);
 
         return response()->json([
             'success' => true,
-            'message' => 'Artículo actualizado exitosamente.',
+            'message' => 'Artículo actualizado y traducido exitosamente.',
             'data'    => $article
         ]);
     }
@@ -70,5 +78,27 @@ class ArticleController extends Controller
             'success' => true,
             'message' => 'Artículo eliminado exitosamente.'
         ]);
+    }
+
+    /**
+     * 🚀 Motor de Traducción Automática Dinámico
+     */
+    private function autoTranslateData(array $data): array
+    {
+        $tr = new GoogleTranslate();
+        $tr->setSource(); // Detectar idioma automáticamente
+
+        $fieldsToTranslate = ['title', 'description'];
+
+        foreach ($fieldsToTranslate as $field) {
+            if (!empty($data[$field])) {
+                $data[$field] = [
+                    'es' => $tr->setTarget('es')->translate($data[$field]),
+                    'en' => $tr->setTarget('en')->translate($data[$field]),
+                ];
+            }
+        }
+
+        return $data;
     }
 }

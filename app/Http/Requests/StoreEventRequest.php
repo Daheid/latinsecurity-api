@@ -20,6 +20,7 @@ class StoreEventRequest extends FormRequest
             'date'       => 'nullable|date',
             'start_time' => 'nullable|date_format:H:i', // Formato de hora 24h ej. 14:30
             'end_time'   => 'nullable|date_format:H:i|after:start_time', // Debe ser después de la hora de inicio
+            'language'   => 'nullable|string|max:255',
             'topics'     => 'nullable|string',
             'objectives' => 'nullable|string',
             'scopes'     => 'nullable|string',
