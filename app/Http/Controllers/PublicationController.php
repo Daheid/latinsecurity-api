@@ -17,7 +17,7 @@ class PublicationController extends Controller
         $publications = Publication::latest()->paginate(10);
 
         $publications->getCollection()->transform(function ($publication) {
-            $publication->pdf_url = asset('storage/' . $publication->pdf_path);
+            $publication->pdf_url = $publication->pdf_path ? asset('storage/' . $publication->pdf_path) : null;
             return $publication;
         });
 
@@ -68,7 +68,7 @@ class PublicationController extends Controller
         $validatedData = $this->autoTranslateData($validatedData);
 
         $publication->update($validatedData);
-        $publication->pdf_url = asset('storage/' . $publication->pdf_path);
+        $publication->pdf_url = $publication->pdf_path ? asset('storage/' . $publication->pdf_path) : null;
 
         return response()->json([
             'success' => true,
@@ -99,7 +99,7 @@ class PublicationController extends Controller
             'success'      => true,
             'message'      => 'Descarga registrada.',
             'downloads'    => $publication->downloads,
-            'download_url' => asset('storage/' . $publication->pdf_path)
+            'download_url' => $publication->pdf_path ? asset('storage/' . $publication->pdf_path) : null
         ]);
     }
 

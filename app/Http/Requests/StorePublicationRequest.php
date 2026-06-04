@@ -28,7 +28,7 @@ class StorePublicationRequest extends FormRequest
             'research_area'        => 'required|string|max:150',
             'abstract'             => 'required|string',
             'keywords'             => 'nullable|string', // Puedes cambiarlo a 'array' si los envías como arreglo
-            'pdf_file'             => 'required|file|mimes:pdf|max:10240', // Obligatorio, solo PDF, máx 10MB
+            'pdf_file'             => 'nullable|file|mimes:pdf|max:10240', // Opcional, solo PDF, máx 10MB
         ];
     }
 
